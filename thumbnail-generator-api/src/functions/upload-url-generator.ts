@@ -32,6 +32,9 @@ export const handle = async (event: APIGatewayProxyEvent): Promise<APIGatewayPro
     Bucket: bucket,
     Key: fullPath,
     Expires: 1200, // 20 minutes
+    Conditions: [
+      ['content-length-range', 0, 5242880],
+    ],
   };
 
   const upload_url = await s3Client.getSignedUrlPromise('putObject', params);
