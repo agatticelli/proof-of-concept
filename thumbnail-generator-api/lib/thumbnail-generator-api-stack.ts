@@ -15,7 +15,7 @@ export class ThumbnailGeneratorApiStack extends Stack {
 
     // create lambda function to update images to s3
     const uploadHandler = new NodejsFunction(this, 'ImageUploadHandler', {
-      entry: 'src/functions/uploader.ts',
+      entry: 'src/functions/upload-url-generator.ts',
       handler: 'handle',
       runtime: Runtime.NODEJS_14_X,
       environment: {
