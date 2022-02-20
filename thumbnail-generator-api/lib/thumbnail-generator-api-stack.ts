@@ -10,7 +10,7 @@ export class ThumbnailGeneratorApiStack extends Stack {
     super(scope, id, props);
 
     // create bucket to store uploaded images
-    new Bucket(this, 'ThumbnailBucket', {
+    const bucket = new Bucket(this, 'ThumbnailBucket', {
       bucketName: 'thumbnails-store',
     });
 
@@ -19,13 +19,17 @@ export class ThumbnailGeneratorApiStack extends Stack {
       entry: 'src/functions/uploader.ts',
       handler: 'handle',
       runtime: Runtime.NODEJS_14_X,
+      environment: {
+        BUCKET_NAME: bucket.bucketName,
+      },
     });
 
+    // grant lambda function to write to bucket
+    bucket.grantWrite(uploadHandler);
+
     // create API gateway to expose upload handler
-    const api = new RestApi(this, 'ThumbnailGeneratorApi', {
-      binaryMediaTypes: ['image/png', 'image/jpeg'],
-    });
-    const uploadEndpoint = api.root.addResource('upload');
+    const api = new RestApi(this, 'ThumbnailGeneratorApi');
+    const uploadEndpoint = api.root.addResource('images');
     uploadEndpoint.addMethod('POST', new LambdaIntegration(uploadHandler));
   }
 }
