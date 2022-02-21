@@ -6,6 +6,8 @@ import { Bucket, EventType } from 'aws-cdk-lib/aws-s3';
 import { S3EventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import { Construct } from 'constructs';
 
+import { bucketName, thumbnailsSizes } from '../src/config';
+
 export class ThumbnailGeneratorApiStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
@@ -13,7 +15,7 @@ export class ThumbnailGeneratorApiStack extends Stack {
     // --------- IMAGE CREATION ---------
     // create bucket to store uploaded images
     const bucket = new Bucket(this, 'ThumbnailBucket', {
-      bucketName: 'thumbnails-store',
+      bucketName,
     });
 
     // create lambda function to update images to s3
@@ -22,7 +24,8 @@ export class ThumbnailGeneratorApiStack extends Stack {
       handler: 'handle',
       runtime: Runtime.NODEJS_14_X,
       environment: {
-        BUCKET_NAME: bucket.bucketName,
+        THUMBNAILS_BUCKET_NAME: bucket.bucketName,
+        THUMBNAILS_SIZES: thumbnailsSizes,
       },
     });
 
@@ -41,9 +44,12 @@ export class ThumbnailGeneratorApiStack extends Stack {
       entry: 'src/functions/resizer.ts',
       handler: 'handle',
       runtime: Runtime.NODEJS_14_X,
+      environment: {
+        THUMBNAILS_SIZES: thumbnailsSizes,
+      },
       bundling: {
         nodeModules: ['sharp'],
-      }
+      },
     });
 
     // bind s3 event source to resize handler
@@ -63,7 +69,7 @@ export class ThumbnailGeneratorApiStack extends Stack {
       handler: 'handle',
       runtime: Runtime.NODEJS_14_X,
       environment: {
-        BUCKET_NAME: bucket.bucketName,
+        THUMBNAILS_BUCKET_NAME: bucket.bucketName,
       },
     });
 
