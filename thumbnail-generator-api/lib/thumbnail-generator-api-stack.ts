@@ -54,5 +54,23 @@ export class ThumbnailGeneratorApiStack extends Stack {
 
     // grant resize function to read/write from/to bucket
     bucket.grantReadWrite(resizerHandler);
+
+
+    // --------- THUMBNAIL DOWNLOADER ---------
+    // create thumbnail download handler
+    const downloadThumbnailHandler = new NodejsFunction(this, 'DownloadThumbnailHandler', {
+      entry: 'src/functions/downloader.ts',
+      handler: 'handle',
+      runtime: Runtime.NODEJS_14_X,
+      environment: {
+        BUCKET_NAME: bucket.bucketName,
+      },
+    });
+
+    // add handler to api
+    imageEndpoint.addMethod('GET', new LambdaIntegration(downloadThumbnailHandler));
+
+    // grant downloader function to read from bucket
+    bucket.grantRead(downloadThumbnailHandler);
   }
 }
