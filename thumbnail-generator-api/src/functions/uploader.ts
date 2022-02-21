@@ -1,10 +1,10 @@
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { fileTypeFromBuffer } from 'file-type';
+import { nanoid } from "nanoid";
 
-
-
-import { badRequest, internalServerError, ok } from "../utils/responses";
+import { badRequest, ok } from "../utils/responses";
+import { availableSizes, thumbnailsPath } from "../commons";
 
 type UploadEventBody = {
   fileName: string;
@@ -21,11 +21,11 @@ export const handle = async (event: APIGatewayEvent): Promise<APIGatewayProxyRes
     throw new Error("Bucket name is not defined");
   }
 
-  let fileName;
+  let fileName: string;
   let fileContent;
   try {
     const input = JSON.parse(event.body ?? '') as UploadEventBody;
-    fileName = input.fileName;
+    fileName = `${nanoid(5)}-${encodeURIComponent(input.fileName)}`;
     fileContent = input.content;
   } catch (err) {
     return badRequest("Invalid request body");
@@ -62,9 +62,14 @@ export const handle = async (event: APIGatewayEvent): Promise<APIGatewayProxyRes
     Key: `${uploadPath}${fileName}`,
     Body: fileBuffer,
   });
-  const response = await client.send(command);
+  await client.send(command);
 
-  console.log(response);
+  const thumbnails = availableSizes.reduce<string[]>((acc, size) => {
+    acc.push(`${thumbnailsPath}${size}/${fileName}`);
+    return acc;
+  }, []);
 
-  return ok({})
+  return ok({
+    thumbnails,
+  });
 }
