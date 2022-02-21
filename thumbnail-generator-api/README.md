@@ -34,3 +34,9 @@ To delete all deployed stack just run:
 ```bash
 cdk destroy
 ```
+
+## Swagger Docs UI
+In order to see/edit swagger docs, you should navigate into _swagger-docs_ folder and run start scripts.
+```bash
+cd swagger-docs && npm start
+```
