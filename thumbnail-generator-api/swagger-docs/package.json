@@ -1,0 +1,21 @@
+{
+  "name": "thumbnail-generator-docs",
+  "version": "1.0.0",
+  "description": "Swagger docs for thumbnail generator.",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "npm install",
+    "start": "nodemon --ext yaml index.js"
+  },
+  "keywords": [
+    "swagger"
+  ],
+  "license": "Unlicense",
+  "private": true,
+  "dependencies": {
+    "oas3-tools": "^2.2.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}

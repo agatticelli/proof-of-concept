@@ -1,0 +1,113 @@
+openapi: 3.0.1
+info:
+  title: Thumbnail generator
+  description: This is a basic file uploader which generates thumbnails to be downloaded.
+  contact:
+    email: agatticeli@gmail.com
+  version: 1.0.0
+servers:
+- url: https://petstore.swagger.io/v2
+tags:
+- name: images
+  description: Upload and download images.
+paths:
+  /images:
+    get:
+      tags:
+      - images
+      summary: Download generated thumbnail
+      operationId: downloadThumbnail
+      parameters:
+      - name: filename
+        in: query
+        description: Filename to download
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "301":
+          description: Redirect to s3 presigned url to start download.
+          headers:
+            Location:
+              description: The presigned url to follow.
+              style: simple
+              explode: false
+              schema:
+                type: string
+        "404":
+          description: File does not exist.
+      x-swagger-router-controller: Images
+    post:
+      tags:
+      - images
+      summary: Upload a new image in order to generate thumbnails
+      operationId: createImage
+      requestBody:
+        description: File information and content to upload.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/images_body'
+            example:
+              filename: baymax.png
+              content: base64-encoded-blob
+        required: true
+      responses:
+        "200":
+          description: Image uploaded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+              example:
+                thumbnails:
+                - thumbnails/400x300/4dLi-baymax.png
+                - thumbnails/200x160/4dLi-baymax.png
+                - thumbnails/160x160/4dLi-baymax.png
+        "400":
+          description: Error inside the body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: filename is not defined
+        "500":
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Internal Server Error
+      x-swagger-router-controller: Images
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+    images_body:
+      required:
+      - content
+      - filename
+      type: object
+      properties:
+        filename:
+          type: string
+        content:
+          type: string
+    inline_response_200:
+      type: object
+      properties:
+        thumbnails:
+          type: array
+          items:
+            type: string
+      example:
+        thumbnails:
+        - thumbnails
+        - thumbnails
