@@ -6,13 +6,9 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { notFound, redirect } from "../utils/responses";
 
 const client = new S3Client({});
+const bucket = process.env.THUMBNAILS_BUCKET_NAME;
 
 export const handle = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
-  const bucket = process.env.BUCKET_NAME;
-  if (!bucket) {
-    throw new Error("Bucket name is not defined");
-  }
-
   const filename = event.queryStringParameters?.filename ?? null;
   if (!filename) {
     return notFound();

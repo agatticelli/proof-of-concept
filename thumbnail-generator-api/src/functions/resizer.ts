@@ -4,9 +4,10 @@ import { S3Client, PutObjectCommand, GetObjectCommand, GetObjectCommandOutput } 
 import { S3CreateEvent } from "aws-lambda";
 import sharp from 'sharp';
 
-import { thumbnailsPath, availableSizes } from '../commons';
+import { thumbnailsPath } from '../commons';
 
 const client = new S3Client({});
+const availableSizes = process.env.THUMBNAILS_SIZES?.split(',') || [];
 
 export const handle = async (event: S3CreateEvent): Promise<void> => {
   // retrieve original data
