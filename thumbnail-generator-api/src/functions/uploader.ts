@@ -29,11 +29,11 @@ export const handle = async (event: APIGatewayEvent): Promise<APIGatewayProxyRes
   }
 
   if (!fileName) {
-    return badRequest('File name is not defined');
+    return badRequest('filename is not defined');
   }
 
   if (!fileContent) {
-    return badRequest('File content is not defined');
+    return badRequest('content is empty');
   }
 
   // create buffer from file content
