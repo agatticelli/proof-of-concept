@@ -1,14 +1,36 @@
-# Welcome to your CDK TypeScript project!
+# Thumbnail generator
 
-This is a blank project for TypeScript development with CDK.
+This project deploys all necessary AWS services needed to upload an image, generate thubmnails and make those thumnails available for download.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## Requirements
+- AWS CLI
+- AWS CDK (>=2.12.0)
+- NodeJS (>= 10.13.0)
 
-## Useful commands
+## Usage
+### 1. Setup AWS account
+First setup the aws account to use. Open a terminal and run:
+```bash
+aws configure
+```
 
- * `npm run build`   compile typescript to js
- * `npm run watch`   watch for changes and compile
- * `npm run test`    perform the jest unit tests
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk synth`       emits the synthesized CloudFormation template
+### 2. Deploy with CDK
+Configure environment variables and deploy :)
+```bash
+FOO=123 BAR=abc cdk deploy
+```
+
+## Available configurations
+This project can be customizez by using the following envinroment variables.
+
+#### BUCKET_NAME
+The destination bucket where files are uploaded. Default _thumbnails-store_.
+
+#### THUMBNAIL_SIZES
+Specifies the available sizes, separated by comma, for the generated thubmnails. Default _400x300,160x120,120x120_.
+
+## Cleanup
+To delete all deployed stack just run:
+```bash
+cdk destroy
+```
