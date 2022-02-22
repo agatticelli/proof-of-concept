@@ -1,8 +1,9 @@
 module.exports = {
   testEnvironment: 'node',
   roots: ['<rootDir>/test'],
-  testMatch: ['**/*.test.ts'],
-  transform: {
-    '^.+\\.tsx?$': 'ts-jest'
-  }
+  testMatch: ['**/*.spec.js'],
+  collectCoverageFrom: ['src/**'],
+  setupFilesAfterEnv: [
+    '<rootDir>/jest.env.js',
+  ],
 };
