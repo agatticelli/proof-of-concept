@@ -1,4 +1,7 @@
 *.js
+!*.spec.js
+!babel.config.js
+!jest.env.js
 !jest.config.js
 *.d.ts
 node_modules
