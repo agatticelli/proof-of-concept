@@ -7,7 +7,7 @@ import { badRequest, ok } from '../utils/responses';
 import { thumbnailsPath } from '../commons';
 
 type UploadEventBody = {
-  fileName: string;
+  filename: string;
   content: string;
 };
 
@@ -18,23 +18,23 @@ const availableSizes = process.env.THUMBNAILS_SIZES?.split(',') || [];
 const bucket = process.env.THUMBNAILS_BUCKET_NAME;
 
 export const handle = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
-  let fileName: string;
-  let fileContent;
+  let input: UploadEventBody;
   try {
-    const input = JSON.parse(event.body ?? '') as UploadEventBody;
-    fileName = `${nanoid(5)}-${encodeURIComponent(input.fileName)}`;
-    fileContent = input.content;
+    input = JSON.parse(event.body ?? '') as UploadEventBody;
   } catch (err) {
     return badRequest('Invalid request body');
   }
 
-  if (!fileName) {
+  if (!input.filename) {
     return badRequest('filename is not defined');
   }
 
-  if (!fileContent) {
+  if (!input.content) {
     return badRequest('content is empty');
   }
+
+  const filename = `${nanoid(5)}-${encodeURIComponent(input.filename)}`;
+  const fileContent = input.content;
 
   // create buffer from file content
   const fileBuffer = Buffer.from(fileContent, 'base64');
@@ -56,13 +56,13 @@ export const handle = async (event: APIGatewayEvent): Promise<APIGatewayProxyRes
 
   const command = new PutObjectCommand({
     Bucket: bucket,
-    Key: `${uploadPath}${fileName}`,
+    Key: `${uploadPath}${filename}`,
     Body: fileBuffer,
   });
   await client.send(command);
 
   const thumbnails = availableSizes.reduce<string[]>((acc, size) => {
-    acc.push(`${thumbnailsPath}${size}/${fileName}`);
+    acc.push(`${thumbnailsPath}${size}/${filename}`);
     return acc;
   }, []);
 
